@@ -94,9 +94,8 @@ const $=s=>document.querySelector(s),L=localStorage,cl=s=>Array.from(String(s||"
 try{Object.assign(S,JSON.parse(L.wq||"{}"))}catch(e){}S.h=S.h||{};S.n=cl(S.n);S.z=S.z?1:0;
 const sv=()=>L.wq=JSON.stringify(S),q=new URLSearchParams(location.search).get("d");
 const now=()=>q?new Date(q+"T12:00:00"):new Date();
-let St=480,E=1050,ed=null,key="",dkey="";
-function init(){const n=now(),k=ds(n);if(k==key)return;key=k;const r=S.r[k];if(r){St=r[0];E=r[1]}else{const hf=S.h[k]||"",be=hf=="p"?720:1050;St=hf=="a"?810:480;const c=calc(n,S,St,be);
-E=c.bal>0?Math.max(hf?0:960,be-Math.min(c.bal,90)):be-c.bal}}
+let St=480,E=1050,ed=null,key="",dkey="",dirty=0;const nowMin=()=>{const n=now();return n.getHours()*60+n.getMinutes()};
+function init(){const n=now(),k=ds(n);if(k==key)return;key=k;dirty=0;const r=S.r[k];if(r){St=r[0];E=r[1]}else{const hf=S.h[k]||"";St=hf=="a"?810:480;E=nowMin()}}
 function render(){init();const n=now(),c=calc(n,S,St,E),fr=Math.min(1,c.done/c.need||0),R=82,C=2*Math.PI*R,a=-Math.PI/2+2*Math.PI*fr;
 $("#pl").textContent="월화수목금日".charAt(c.ti>4?5:c.ti).replace("日","주말")+(c.ti>4?"":"요일")+" · 오늘";
 const star=fr>0?`<path d="M${100+R*Math.cos(a)},${100+R*Math.sin(a)-8}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)+8},${100+R*Math.sin(a)}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)},${100+R*Math.sin(a)+8}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)-8},${100+R*Math.sin(a)}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)},${100+R*Math.sin(a)-8}Z" fill="#F6C65B"/>`:"";
@@ -124,9 +123,9 @@ function toast(s){const t=$("#toast");t.textContent=s;t.className="on";setTimeou
 function key2(k){const v=ed.buf;if(k=="c"){ed=null;return render()}if(k=="d")ed.buf=v.slice(0,-1);
 else if(k=="n"){const cur=ed.k=="s"?St:E,pm=ed.k=="e";let n=v===""?null:+v;
 if(ed.f=="h"){const h=n===null?(Math.floor(cur/60)%12||12):n;if(h<1||h>12){render();$("#kt").textContent="시는 1~12 사이로 입력해 주세요";$("#kt").className="kt e";return}
-const m=cur%60,nv=(ed.k=="s"?(h>=6&&h<=11?h:h==12?12:h+12):(h==12?12:S.h[ds(now())]=="p"&&h>=6&&h<=11?h:h+12))*60+m;ed.k=="s"?St=nv:E=nv;ed.f="m";ed.buf=""}
+const m=cur%60,nv=(ed.k=="s"?(h>=6&&h<=11?h:h==12?12:h+12):(h==12?12:S.h[ds(now())]=="p"&&h>=6&&h<=11?h:h+12))*60+m;ed.k=="s"?St=nv:(E=nv,dirty=1);ed.f="m";ed.buf=""}
 else{const mi=n===null?cur%60:n;if(mi>59){render();$("#kt").textContent="분은 0~59 사이로 입력해 주세요";$("#kt").className="kt e";return}
-const nv=Math.floor(cur/60)*60+mi;ed.k=="s"?St=nv:E=nv;ed=null}return render()}
+const nv=Math.floor(cur/60)*60+mi;ed.k=="s"?St=nv:(E=nv,dirty=1);ed=null}return render()}
 else if(v.length<2)ed.buf=v+k;
 render();if(ed){const el=$(ed.k=="s"?(ed.f=="h"?"#eh":"#em"):ed.f=="h"?"#eh":"#em");if(ed.buf!==""){el.textContent=ed.buf}}}
 function openDay(i){const c=calc(now(),S,St,E),x=c.days[i],k=x.k,r=S.r[k],cur=S.v.includes(k)?"v":S.h[k]||"",mm=k.split("-");dkey=k;
@@ -144,7 +143,7 @@ if(b.dataset.t){const k=dkey,t=b.dataset.t,cur=S.v.includes(k)?"v":S.h[k]||"";S.
 if(b.dataset.pt){const t=$("#pt").value.split(":");if(t.length<2)return;const k=b.dataset.pt;S.r[k]=[S.r[k]?S.r[k][0]:(S.h[k]=="a"?810:480),+t[0]*60+ +t[1]];sv();$("#dsh").classList.remove("on");render();return toast("퇴근 시각을 고쳤어요")}
 if(b.dataset.pc){delete S.r[b.dataset.pc];sv();$("#dsh").classList.remove("on");render();return toast("기록을 지웠어요")}
 if(b.dataset.k!==undefined&&ed)return key2(b.dataset.k);
-if(b.dataset.d){E=Math.min(1439,Math.max(0,E+ +b.dataset.d));return render()}
+if(b.dataset.d){E=Math.min(1439,Math.max(0,E+ +b.dataset.d));dirty=1;return render()}
 if(b.id=="eh"||b.id=="em"){if(!calc(now(),S,St,E).td)return;ed={k:ed&&ed.k=="s"?"s":"e",f:b.id=="eh"?"h":"m",buf:""};return render()}
 if(b.id=="st"){ed={k:"s",f:"h",buf:""};return render()}
 if(b.id=="rc"){const c=calc(now(),S,St,E);if(!c.td)return;S.r[ds(now())]=[St,E];sv();toast("퇴근 시각을 기록했어요");render()}
@@ -155,5 +154,6 @@ if(b.id=="rs"){const j=prompt("백업 내용을 붙여넣어 주세요");if(j){t
 if(b.dataset.rm){const[a,v]=b.dataset.rm.split("|");S[a]=S[a].filter(x=>x!=v);sv();tags();render()}});
 function tags(){const f=(a,id)=>$(id).innerHTML=S[a].sort().map(v=>`<span><button class="gear" style="font-size:13px" data-rm="${a}|${v}">${v} ✕</button></span>`).join("")||"<span>없음</span>";f("v","#tv");f("x","#tx")}
 const prev=()=>{const v=cl($("#ni").value);$("#np").textContent=v?"미리보기 · ✦ "+v+" ✦":"비워두면 이름 줄이 표시되지 않아요"};$("#ni").addEventListener("input",prev);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden){render()}});render();if(!S.z)$("#nm").classList.add("on");
+const sync=()=>{if(!S.r[ds(now())]&&!dirty&&!ed)E=nowMin()};
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){sync();render()}});window.addEventListener("pageshow",()=>{sync();render()});render();if(!S.z)$("#nm").classList.add("on");
 </script></body></html>
