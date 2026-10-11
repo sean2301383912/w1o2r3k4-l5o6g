@@ -40,7 +40,7 @@ main{flex:1;overflow-y:auto;padding:0 18px 10px;text-align:center}
 .kg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
 .kg button{border:1px solid var(--bd);background:#fff;border-radius:12px;padding:9px 0;font:600 20px inherit;color:var(--t1)}
 .kg button.s{background:var(--c1);color:var(--ac);font-size:14px}
-#toast{position:fixed;left:50%;top:calc(60px + env(safe-area-inset-top));transform:translateX(-50%);background:#4A2342;color:#fff;border-radius:16px;padding:7px 16px;font-size:13px;opacity:0;transition:.25s;pointer-events:none}
+#toast{z-index:99;position:fixed;left:50%;top:calc(60px + env(safe-area-inset-top));transform:translateX(-50%);background:#4A2342;color:#fff;border-radius:16px;padding:7px 16px;font-size:13px;opacity:0;transition:.25s;pointer-events:none}
 #toast.on{opacity:1}
 #set,#dsh{position:absolute;inset:0;background:var(--bg);display:none;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 18px 18px;overflow-y:auto;z-index:5;-webkit-user-select:auto;user-select:auto}
 #set.on,#dsh.on{display:flex}#set h2,#dsh h2{font-size:15px;margin:14px 0 6px}.hint{font-size:11px;color:var(--t2);text-align:center;margin:0 0 4px}#dsh .go{margin-top:8px}#dsh .go.o{background:#fff;color:var(--ac);border:1px solid #F0A9C7}
@@ -76,7 +76,7 @@ const dw=(now.getDay()+6)%7,m=new Date(now.getFullYear(),now.getMonth(),now.getD
 const days=[0,1,2,3,4].map(i=>{const d=new Date(m.getFullYear(),m.getMonth(),m.getDate()+i);const k=ds(d),t=kind(d,S),hf=t?"":(S.h[k]||"");return{k,t,i,hf,sd:hf?240:480}});
 const ti=dw>4?5:dw,need=days.reduce((a,x)=>a+(x.t?0:x.sd),0);let done=0,bal=0,fut=0;
 days.forEach(x=>{if(x.t||x.i==ti)return;if(x.i>ti){fut++;return}const r=S.r[x.k];x.w=r?wk(r[0],r[1],x.hf):x.sd;done+=x.w;bal+=x.w-x.sd});
-const td=days[ti]&&!days[ti].t,dt=td?days[ti]:{hf:"",sd:480},wt=td?wk(St,E,dt.hf):0,nb=td?bal+wt-dt.sd:bal,be=x=>x.hf=="p"?720:1050,BE=be(dt),FL=dt.hf?0:960,nx=days.find(x=>x.i>ti&&!x.t),NB=nx?be(nx):1050;
+const td=days[ti]&&!days[ti].t,dt=td?days[ti]:{hf:"",sd:480},wt=td?wk(St,E,dt.hf):0,nb=td?bal+wt-dt.sd:bal,be=x=>x.hf=="p"?720:1050,BE=be(dt),FL=dt.hf=="p"?0:960,nx=days.find(x=>x.i>ti&&!x.t),NB=nx?be(nx):1050;
 const loss=nb>0?Math.max(0,nb-90*fut):0;let c1,c2,b1,b2,red=0;
 if(bal>0){c1=["오늘 최단 퇴근",t12(Math.max(FL,BE-Math.min(bal,90)))];c2=["적립 시간","+"+hh(bal),"g"]}
 else if(bal<0){c1=["오늘 필요 퇴근",t12(BE-bal),"r"];c2=["부족 시간","−"+hh(-bal),"r"]}
@@ -114,9 +114,9 @@ $("#mn").className=S.n?"hn":"";$("#mn").innerHTML=`<svg class="crown" width="26"
 <div class="ban ${c.red?"r":""}"><b>${c.b1}</b>${c.b2}</div>
 <div class="card"><h2>이번 주 근무시간<small class="${c.nb<0?"r":""}">${c.nb<0?"금요일까지 못 채우면 "+hh(c.need)+" 미달":"점선 8h 기준 · 금빛 적립"}</small></h2><svg viewBox="0 0 300 132">${ch}</svg><p class="hint">요일을 누르면 연차·반차 지정, 퇴근 시각 수정</p></div>`;
 const dk=c.days[c.ti],hr=Math.floor(E/60)%12||12,kp=ed?`<div class="kp on"><div class="kt" id="kt">${ed.k=="s"?"출근":"퇴근"} ${ed.f=="h"?"시":"분"} 입력</div><div class="kg">${"123456789".replace(/./g,d=>`<button data-k="${d}">${d}</button>`)}<button class="s" data-k="d">지우기</button><button data-k="0">0</button><button class="s" data-k="c">취소</button></div><button class="go" data-k="n">${ed.f=="h"?"다음":"완료"}</button></div>`:"";
-const dis=!c.td;$("#dock").innerHTML=`<div class="lb"><span>${c.td?["월","화","수","목","금"][c.ti]+"요일 퇴근 기록"+(dk.hf?(dk.hf=="a"?" · 오전 반차":" · 오후 반차"):""):"오늘은 "+(dk&&dk.t||"쉬는 날")+"이에요"}</span><a id="st">출근 ${t12(St)}</a></div>
+const early=c.td&&dk.hf!="p"&&E<960,dis=!c.td||early;$("#dock").innerHTML=`<div class="lb"><span>${c.td?["월","화","수","목","금"][c.ti]+"요일 퇴근 기록"+(dk.hf?(dk.hf=="a"?" · 오전 반차":" · 오후 반차"):""):"오늘은 "+(dk&&dk.t||"쉬는 날")+"이에요"}</span><a id="st">출근 ${t12(St)}</a></div>
 <div class="row"><div class="tm"><i>${E<720?"오전":"오후"}</i><b id="eh" class="${ed&&ed.k=="e"&&ed.f=="h"?"on":""}">${hr}</b>:<b id="em" class="${ed&&ed.k=="e"&&ed.f=="m"?"on":""}">${p2(E%60)}</b></div>
-${ed?"":`<div class="pm"><button data-d="-5">−5분</button><button data-d="-1">−1분</button><button data-d="1">+1분</button></div>`}</div>${kp}${ed?"":`<button class="go" id="rc" ${dis?"disabled":""}>퇴근 기록</button>`}`;
+${ed?"":`<div class="pm"><button data-d="-5">−5분</button><button data-d="-1">−1분</button><button data-d="1">+1분</button></div>`}</div>${kp}${ed?"":`${early?`<p class="hint" style="margin:0 0 6px;text-align:center">16:00 이후부터 퇴근을 기록할 수 있어요</p>`:""}<button class="go" id="rc" ${dis?"disabled":""}>퇴근 기록</button>`}`;
 if(ed&&ed.k=="s"){$("#eh").textContent=Math.floor(St/60)%12||12;$("#em").textContent=p2(St%60);$("#eh").className=ed.f=="h"?"on":"";$("#em").className=ed.f=="m"?"on":""}
 }
 function toast(s){const t=$("#toast");t.textContent=s;t.className="on";setTimeout(()=>t.className="",1500)}
@@ -140,13 +140,13 @@ if(b.id=="nl"){S.z=1;sv();$("#nm").classList.remove("on");return toast("설정�
 if(b.id=="nsv"){S.n=cl($("#ni").value);S.z=1;sv();render();return toast(S.n?"닉네임을 저장했어요":"닉네임을 지웠어요")}
 if(b.id=="dc")return $("#dsh").classList.remove("on");
 if(b.dataset.t){const k=dkey,t=b.dataset.t,cur=S.v.includes(k)?"v":S.h[k]||"";S.v=S.v.filter(y=>y!=k);delete S.h[k];if(t!="n"&&t!=cur){t=="v"?S.v.push(k):S.h[k]=t}sv();$("#dsh").classList.remove("on");key="";render();return toast(t=="n"||t==cur?"지정을 해제했어요":"지정했어요")}
-if(b.dataset.pt){const t=$("#pt").value.split(":");if(t.length<2)return;const k=b.dataset.pt;S.r[k]=[S.r[k]?S.r[k][0]:(S.h[k]=="a"?810:480),+t[0]*60+ +t[1]];sv();$("#dsh").classList.remove("on");render();return toast("퇴근 시각을 고쳤어요")}
+if(b.dataset.pt){const t=$("#pt").value.split(":");if(t.length<2)return;const k=b.dataset.pt,tv=+t[0]*60+ +t[1];if(S.h[k]!="p"&&tv<960)return toast("16:00 이전은 기록할 수 없어요");S.r[k]=[S.r[k]?S.r[k][0]:(S.h[k]=="a"?810:480),+t[0]*60+ +t[1]];sv();$("#dsh").classList.remove("on");render();return toast("퇴근 시각을 고쳤어요")}
 if(b.dataset.pc){delete S.r[b.dataset.pc];sv();$("#dsh").classList.remove("on");render();return toast("기록을 지웠어요")}
 if(b.dataset.k!==undefined&&ed)return key2(b.dataset.k);
 if(b.dataset.d){E=Math.min(1439,Math.max(0,E+ +b.dataset.d));dirty=1;return render()}
 if(b.id=="eh"||b.id=="em"){if(!calc(now(),S,St,E).td)return;ed={k:ed&&ed.k=="s"?"s":"e",f:b.id=="eh"?"h":"m",buf:""};return render()}
 if(b.id=="st"){ed={k:"s",f:"h",buf:""};return render()}
-if(b.id=="rc"){const c=calc(now(),S,St,E);if(!c.td)return;S.r[ds(now())]=[St,E];sv();toast("퇴근 시각을 기록했어요");render()}
+if(b.id=="rc"){const c=calc(now(),S,St,E);if(!c.td)return;if(S.h[ds(now())]!="p"&&E<960)return toast("16:00 이후부터 기록할 수 있어요");S.r[ds(now())]=[St,E];sv();toast("퇴근 시각을 기록했어요");render()}
 if(b.id=="gb"){tags();$("#ni").value=S.n;prev();$("#set").classList.add("on")}if(b.id=="sx")$("#set").classList.remove("on");
 if(b.id=="av"||b.id=="ax"){const i=$(b.id=="av"?"#dv":"#dx"),a=b.id=="av"?S.v:S.x;if(i.value&&!a.includes(i.value))a.push(i.value);i.value="";sv();tags();render()}
 if(b.id=="bk"){const j=JSON.stringify(S);(navigator.clipboard?navigator.clipboard.writeText(j):Promise.reject()).then(()=>toast("백업을 복사했어요"),()=>prompt("아래 내용을 복사해 두세요",j))}
