@@ -1,9 +1,9 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="퇴근계산기"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFE0EC"><meta name="robots" content="noindex,nofollow"><link rel="apple-touch-icon" href="apple-touch-icon.png"><title>퇴근 계산기</title>
-<style>
+<style>html,body{touch-action:manipulation;-webkit-text-size-adjust:100%}button,a,input{touch-action:manipulation}
 :root{--t1:#4A2342;--t2:#7C5271;--ac:#A12B62;--bg:#FFF9FC;--c1:#FFF1F7;--c2:#F4EEFF;--bd:#F6CADB;--ok:#2E8B6A;--rd:#C0392B;--gd:#F6C65B;--gr:linear-gradient(90deg,#F27DAB,#C58EF0)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0}
 html,body{height:100%}
@@ -155,5 +155,5 @@ if(b.dataset.rm){const[a,v]=b.dataset.rm.split("|");S[a]=S[a].filter(x=>x!=v);sv
 function tags(){const f=(a,id)=>$(id).innerHTML=S[a].sort().map(v=>`<span><button class="gear" style="font-size:13px" data-rm="${a}|${v}">${v} ✕</button></span>`).join("")||"<span>없음</span>";f("v","#tv");f("x","#tx")}
 const prev=()=>{const v=cl($("#ni").value);$("#np").textContent=v?"미리보기 · ✦ "+v+" ✦":"비워두면 이름 줄이 표시되지 않아요"};$("#ni").addEventListener("input",prev);
 const sync=()=>{if(!S.r[ds(now())]&&!dirty&&!ed)E=nowMin()};
-document.addEventListener("visibilitychange",()=>{if(!document.hidden){sync();render()}});window.addEventListener("pageshow",()=>{sync();render()});render();if(!S.z)$("#nm").classList.add("on");
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){sync();render()}});window.addEventListener("pageshow",()=>{sync();render()});["gesturestart","gesturechange","gestureend"].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));document.addEventListener("touchmove",e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});render();if(!S.z)$("#nm").classList.add("on");
 </script></body></html>
