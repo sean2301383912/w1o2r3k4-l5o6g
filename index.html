@@ -99,15 +99,22 @@ function render(){init();const n=now(),c=calc(n,S,St,E),fr=Math.min(1,c.done/c.n
 $("#pl").textContent="월화수목금日".charAt(c.ti>4?5:c.ti).replace("日","주말")+(c.ti>4?"":"요일")+" · 오늘";
 const star=fr>0?`<path d="M${100+R*Math.cos(a)},${100+R*Math.sin(a)-8}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)+8},${100+R*Math.sin(a)}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)},${100+R*Math.sin(a)+8}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)-8},${100+R*Math.sin(a)}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)},${100+R*Math.sin(a)-8}Z" fill="#F6C65B"/>`:"";
 const B=96,k=7/60,y8=B-480*k;let ch=`<line x1="6" x2="294" y1="${y8}" y2="${y8}" stroke="#F58FB8" stroke-dasharray="5 4"/><line x1="6" x2="294" y1="${B}" y2="${B}" stroke="#F6D6E4"/>`;
-c.days.forEach(x=>{const cx=30+60*x.i,td=x.i==c.ti&&c.td,sd=x.sd||480,y8=B-sd*k,w=x.w;const top=w=>B-w*k,bx=`x="${cx-15}" width="30" rx="5"`,dy=x.hf?`<line x1="${cx-19}" x2="${cx+19}" y1="${y8}" y2="${y8}" stroke="#B79CED" stroke-width="2"/>`:"";
+c.days.forEach(x=>{const cx=30+60*x.i,td=x.i==c.ti&&c.td,sd=x.sd||480,w=x.w,Y8=B-480*k,hb=240*k;const top=w=>B-w*k,bx=`x="${cx-15}" width="30" rx="5"`;
 const tx=(t,y,f,fi)=>`<text x="${cx}" y="${y}" text-anchor="middle" font-size="11" font-weight="${f}" fill="${fi}">${t}</text>`;
-if(x.t){const g=Array.from(x.t),y0=68-(g.length-1)*7;ch+=`<rect ${bx} y="${B-480*k}" height="${480*k}" rx="5" fill="#F7F1FB" stroke="#C9B5EE" stroke-dasharray="3 3"/>`+g.map((q,i)=>tx(q,y0+4+i*14,600,"#7C5271")).join("")}
-else if(td){const h=Math.max(c.wt,0);ch+=`<rect ${bx} y="${top(h)}" height="${h*k}" fill="#FDE2EE" stroke="#F27DAB" stroke-width="1.5" stroke-dasharray="4 3"/>`+tx("오늘",top(h)-5,600,"#A12B62")+dy}
-else if(w!==undefined){const yt=w>sd?y8:top(w);if(w>sd)ch+=`<rect ${bx} y="${top(w)}" height="${(w-sd)*k+8}" fill="#F6C65B"/>`;ch+=`<rect ${bx} y="${yt}" height="${B-yt}" fill="url(#g1)"/>`;
-if(w<sd)ch+=`<rect ${bx} y="${y8}" height="${(sd-w)*k}" fill="#FFEDE3" stroke="#C0392B" stroke-dasharray="3 3"/>`;
-if(w!=sd)ch+=tx(dl(w-sd),(w>sd?top(w):y8)-5,600,w>sd?"#2E8B6A":"#A93226");
-if(B-yt>=26){const cy=(yt+B)/2,st=`paint-order="stroke" stroke="rgba(120,40,100,.35)" stroke-width="2"`;ch+=`<text x="${cx}" y="${cy-1}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" ${st}>${Math.floor(w/60)}h</text><text x="${cx}" y="${cy+11}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" ${st}>${p2(w%60)}m</text>`}ch+=dy}
-else if(x.hf){ch+=`<rect ${bx} y="${y8}" height="${sd*k}" fill="#F4EEFF" stroke="#B79CED" stroke-width="1.5" stroke-dasharray="4 3"/>`+tx("기준 4h",y8-5,600,"#A12B62")}
+const rest=(y,h)=>`<rect ${bx} y="${y}" height="${h}" fill="#F4EEFF" stroke="#B79CED" stroke-width="1.5"/>`;
+if(x.t){const g=Array.from(x.t),y0=68-(g.length-1)*7;ch+=rest(Y8,480*k)+g.map((q,i)=>tx(q,y0+4+i*14,700,"#7C5271")).join("")}
+else if(x.hf){const a=x.hf=="a",bk=(y)=>rest(y,hb)+tx("반차",y+hb/2+4,700,"#7C5271");
+if(td){const h=Math.max(c.wt,0),base=a?B-hb:B,t0=base-h*k;ch+=(a?bk(B-hb):bk(Y8))+`<rect ${bx} y="${t0}" height="${h*k}" fill="#FDE2EE" stroke="#F27DAB" stroke-width="1.5" stroke-dasharray="4 3"/>`+tx("오늘",(a?t0:Y8)-5,600,"#A12B62")}
+else if(w!==undefined){const tot=w+240,yT=B-tot*k;
+if(a)ch+=bk(B-hb)+`<rect ${bx} y="${yT}" height="${w*k}" fill="url(#g1)"/>`;else ch+=`<rect ${bx} y="${B-w*k}" height="${w*k}" fill="url(#g1)"/>`+bk(yT);
+if(tot<480)ch+=`<rect ${bx} y="${Y8}" height="${yT-Y8}" fill="#FFEDE3" stroke="#C0392B" stroke-dasharray="3 3"/>`;
+if(tot>480)ch+=`<rect ${bx} y="${yT}" height="${(tot-480)*k}" fill="#F6C65B" opacity=".9"/>`;
+if(tot!=480)ch+=tx(dl(tot-480),(tot>480?yT:Y8)-5,600,tot>480?"#2E8B6A":"#A93226")}
+else ch+=bk(a?B-hb:Y8)}
+else if(td){const h=Math.max(c.wt,0);ch+=`<rect ${bx} y="${top(h)}" height="${h*k}" fill="#FDE2EE" stroke="#F27DAB" stroke-width="1.5" stroke-dasharray="4 3"/>`+tx("오늘",top(h)-5,600,"#A12B62")}
+else if(w!==undefined){const yt=w>sd?Y8:top(w);if(w>sd)ch+=`<rect ${bx} y="${top(w)}" height="${(w-sd)*k+8}" fill="#F6C65B"/>`;ch+=`<rect ${bx} y="${yt}" height="${B-yt}" fill="url(#g1)"/>`;
+if(w<sd)ch+=`<rect ${bx} y="${Y8}" height="${(sd-w)*k}" fill="#FFEDE3" stroke="#C0392B" stroke-dasharray="3 3"/>`;
+if(w!=sd)ch+=tx(dl(w-sd),(w>sd?top(w):Y8)-5,600,w>sd?"#2E8B6A":"#A93226")}
 ch+=`<text x="${cx}" y="113" text-anchor="middle" font-size="12" font-weight="600" fill="#4A2342">${"월화수목금"[x.i]+(x.hf?"·반":"")}</text><rect x="${cx-29}" y="0" width="58" height="118" fill="transparent" data-day="${x.i}"/>`});
 $("#mn").className=S.n?"hn":"";$("#mn").innerHTML=`<svg class="crown" width="26" height="19" viewBox="22 30 28 22"><path d="M24,49 24,36 31,42 36,33 41,42 48,36 48,49Z" fill="#F6C65B" stroke="#D99A2B" stroke-linejoin="round"/><rect x="24" y="45" width="24" height="4" rx="2" fill="#F58FB8"/></svg>${S.n?`<div class="nk"><i>✦</i><span>${es(S.n)}</span><i>✦</i></div>`:""}
 <div class="ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="${R}" fill="#fff" stroke="#F6D6E4" stroke-width="13"/><circle cx="100" cy="100" r="${R}" fill="none" stroke="url(#g1)" stroke-width="13" stroke-linecap="round" stroke-dasharray="${fr*C} ${C}" transform="rotate(-90 100 100)"/>${star}</svg>
