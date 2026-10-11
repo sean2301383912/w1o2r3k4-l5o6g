@@ -1,0 +1,159 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="퇴근계산기"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#FFE0EC"><meta name="robots" content="noindex,nofollow"><link rel="apple-touch-icon" href="apple-touch-icon.png"><title>퇴근 계산기</title>
+<style>
+:root{--t1:#4A2342;--t2:#7C5271;--ac:#A12B62;--bg:#FFF9FC;--c1:#FFF1F7;--c2:#F4EEFF;--bd:#F6CADB;--ok:#2E8B6A;--rd:#C0392B;--gd:#F6C65B;--gr:linear-gradient(90deg,#F27DAB,#C58EF0)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0}
+html,body{height:100%}
+body{font:15px/1.35 -apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--t1);background:linear-gradient(135deg,#FFE0EC,#F6E3FA 55%,#E6DDFB);overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+#app{height:100dvh;display:flex;flex-direction:column;max-width:480px;margin:0 auto;background:var(--bg);position:relative}
+header{display:flex;align-items:center;gap:8px;padding:calc(12px + env(safe-area-inset-top)) 18px 6px}
+h1{font-size:18px;font-weight:600;flex:1}
+.pill{background:#FDE2EE;border:1px solid #F6B7D2;color:var(--ac);border-radius:14px;padding:3px 12px;font-size:12px;font-weight:600}
+.gear{border:0;background:none;font-size:20px;color:var(--t2);padding:4px}
+main{flex:1;overflow-y:auto;padding:0 18px 10px;text-align:center}
+.crown{display:block;margin:0 auto -4px}
+.ring{width:min(60vw,31dvh,230px);aspect-ratio:1;margin:0 auto;position:relative;background:var(--c1);border-radius:50%;padding:4%}
+.ring svg{width:100%;height:100%;display:block}
+.nk{margin:4px 0 6px;font-size:17px;font-weight:700;display:flex;justify-content:center;align-items:center;gap:10px;min-height:22px}.nk i{font-style:normal;color:var(--gd);font-size:13px}.nk span{max-width:62%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hn .ring{width:min(54vw,27dvh,210px)}
+.in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--t2)}
+.in b{font-size:clamp(20px,4.6dvh,26px);color:var(--t1);font-weight:600;margin:3px 0}
+.chips{display:flex;gap:10px;margin:12px 0 10px}
+.chip{flex:1;border:1px solid var(--bd);border-radius:24px;padding:6px 4px;background:var(--c1);font-size:11px;color:var(--t2)}
+.chip+.chip{background:var(--c2)}.chip b{display:block;font-size:17px;font-weight:600;color:#C23B7B}
+.chip.g b{color:var(--ok)}.chip.r b{color:var(--rd)}
+.ban{text-align:left;border:1px solid #F6B7D2;background:#FDE9F2;border-radius:16px;padding:9px 14px;margin-bottom:10px;font-size:13px}
+.ban b{display:block;font-size:14px;font-weight:600}.ban.r{background:#FFEDE3;border-color:#F5B9A0;color:#6B2412}
+.card{background:#fff;border:1px solid var(--bd);border-radius:16px;padding:10px 12px 6px;text-align:left}
+.card h2{font-size:13px;font-weight:600;display:flex;justify-content:space-between}.card h2 small{font-weight:400;font-size:11px;color:var(--t2)}.card h2 small.r{color:var(--rd);font-weight:600}
+.card svg{width:100%;display:block}
+#dock{background:var(--c1);border-top:1px solid var(--bd);border-radius:22px 22px 0 0;padding:12px 18px calc(14px + env(safe-area-inset-bottom))}
+.lb{font-size:12px;color:var(--t2);display:flex;justify-content:space-between}.lb a{color:var(--ac);text-decoration:underline}
+.row{display:flex;align-items:center;justify-content:space-between;margin:2px 0 8px}
+.tm{font-size:28px;font-weight:600;display:flex;align-items:center}.tm i{font-style:normal;font-size:22px;margin-right:6px}
+.tm b{font-weight:600;padding:0 6px;border-radius:10px;border:2px solid transparent}.tm b.on{border-color:#F27DAB;background:#fff}
+.pm{display:flex;gap:6px}.pm button,.sm{border:1px solid #F0A9C7;background:#fff;color:var(--ac);border-radius:15px;padding:6px 11px;font:13px inherit}
+.go{width:100%;border:0;border-radius:20px;padding:11px;font:600 15px inherit;color:#fff;background:var(--gr)}.go:disabled{opacity:.45}
+.kp{display:none}.kp.on{display:block}.kt{font-size:12px;color:var(--t2);margin-bottom:6px;min-height:16px}.kt.e{color:var(--rd);font-weight:600}
+.kg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
+.kg button{border:1px solid var(--bd);background:#fff;border-radius:12px;padding:9px 0;font:600 20px inherit;color:var(--t1)}
+.kg button.s{background:var(--c1);color:var(--ac);font-size:14px}
+#toast{position:fixed;left:50%;top:calc(60px + env(safe-area-inset-top));transform:translateX(-50%);background:#4A2342;color:#fff;border-radius:16px;padding:7px 16px;font-size:13px;opacity:0;transition:.25s;pointer-events:none}
+#toast.on{opacity:1}
+#set,#dsh{position:absolute;inset:0;background:var(--bg);display:none;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 18px 18px;overflow-y:auto;z-index:5;-webkit-user-select:auto;user-select:auto}
+#set.on,#dsh.on{display:flex}#set h2,#dsh h2{font-size:15px;margin:14px 0 6px}.hint{font-size:11px;color:var(--t2);text-align:center;margin:0 0 4px}#dsh .go{margin-top:8px}#dsh .go.o{background:#fff;color:var(--ac);border:1px solid #F0A9C7}
+#set input,#dsh input,#nm input{font-size:16px;border:1px solid var(--bd);border-radius:10px;padding:7px;color:var(--t1);background:#fff}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.tags span{background:var(--c2);border-radius:12px;padding:3px 10px;font-size:13px}
+.hd{display:flex;gap:8px;align-items:center}
+input{-webkit-user-select:text;user-select:text}
+#nm{position:absolute;inset:0;background:rgba(74,35,66,.45);display:none;align-items:center;justify-content:center;z-index:9;padding:24px}#nm.on{display:flex}#nm .bx{background:var(--bg);border:1px solid var(--bd);border-radius:22px;padding:22px 20px 18px;width:100%;text-align:center}#nm h2{font-size:17px;margin:8px 0 4px}#nm p{font-size:12px;color:var(--t2);margin-bottom:12px}#nm input{width:100%;text-align:center;font-size:18px}#nm .sm{margin-top:8px}
+</style></head><body><div id="app">
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F58FB8"/><stop offset="1" stop-color="#B79CED"/></linearGradient></defs></svg>
+<header><h1>퇴근 계산기</h1><span class="pill" id="pl"></span><button class="gear" id="gb" aria-label="설정">⚙︎</button></header>
+<main id="mn"></main>
+<div id="dock"></div><div id="toast"></div>
+<div id="set"><div class="hd"><h1>설정</h1><button class="sm" id="sx">닫기</button></div>
+<h2>닉네임</h2><div class="hd"><input id="ni" maxlength="8" placeholder="최대 8글자 · 비우면 표시 안 함" style="flex:1;min-width:0"><button class="sm" id="nsv">저장</button></div><p class="hint" id="np" style="text-align:left;margin-top:6px"></p>
+<h2>연차 추가 (하루 8시간 차감)</h2><div class="hd"><input type="date" id="dv"><button class="sm" id="av">추가</button></div><div class="tags" id="tv"></div>
+<h2>임시공휴일 추가</h2><div class="hd"><input type="date" id="dx"><button class="sm" id="ax">추가</button></div><div class="tags" id="tx"></div>
+<h2>백업</h2><div class="hd"><button class="sm" id="bk">백업 복사</button><button class="sm" id="rs">불러오기</button></div>
+<p style="font-size:12px;color:var(--t2);margin-top:14px">공휴일은 2026년 10월~2027년까지 내장되어 있어요. 기록은 이 기기에만 저장돼요. 태그를 누르면 삭제돼요.</p></div>
+<div id="dsh"><div class="hd"><h1 id="dt" style="flex:1"></h1><button class="sm" id="dc">닫기</button></div><div id="db"></div></div>
+<div id="nm"><div class="bx"><svg width="34" height="25" viewBox="22 30 28 22"><path d="M24,49 24,36 31,42 36,33 41,42 48,36 48,49Z" fill="#F6C65B" stroke="#D99A2B" stroke-linejoin="round"/><rect x="24" y="45" width="24" height="4" rx="2" fill="#F58FB8"/></svg><h2>닉네임을 정해주세요</h2><p>앱 위쪽에 보여드릴게요 · 최대 8글자</p><input id="nn" maxlength="8" placeholder="닉네임 입력" autocomplete="off"><button class="go" id="ns" style="margin-top:12px">시작하기</button><button class="sm" id="nl">나중에</button></div></div></div>
+<script>
+/*L*/
+const H=new Set("2026-10-05 2026-10-09 2026-12-25 2027-01-01 2027-02-08 2027-02-09 2027-03-01 2027-05-03 2027-05-05 2027-05-13 2027-07-19 2027-08-16 2027-09-14 2027-09-15 2027-09-16 2027-10-04 2027-10-11 2027-12-27".split(" "));
+const p2=n=>String(n).padStart(2,"0"),ds=d=>d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate());
+const lunch=(s,e)=>Math.max(0,Math.min(e,780)-Math.max(s,690)),wk=(s,e,h)=>Math.max(0,e-s-Math.max(0,Math.min(e,780)-Math.max(s,h=="p"?720:690)));
+const t12=m=>"오"+(m<720?"전":"후")+" "+((Math.floor(m/60)%12)||12)+":"+p2(m%60),hh=m=>Math.round(m/6)/10+"h",hm=m=>Math.floor(m/60)+"h "+p2(m%60)+"m";
+const dl=m=>(m<0?"−":"+")+Math.floor(Math.abs(m)/60)+":"+p2(Math.abs(m)%60);
+function kind(d,S){const k=ds(d);if(H.has(k)||S.x.includes(k))return"공휴일";if(S.v.includes(k))return"연차";
+if(d.getDay()==5){const t=new Date(d-864e5).getDate();if(t>=8&&t<=14||t>=22&&t<=28)return"휴무"}return""}
+function calc(now,S,St,E){
+const dw=(now.getDay()+6)%7,m=new Date(now.getFullYear(),now.getMonth(),now.getDate()-dw);
+const days=[0,1,2,3,4].map(i=>{const d=new Date(m.getFullYear(),m.getMonth(),m.getDate()+i);const k=ds(d),t=kind(d,S),hf=t?"":(S.h[k]||"");return{k,t,i,hf,sd:hf?240:480}});
+const ti=dw>4?5:dw,need=days.reduce((a,x)=>a+(x.t?0:x.sd),0);let done=0,bal=0,fut=0;
+days.forEach(x=>{if(x.t||x.i==ti)return;if(x.i>ti){fut++;return}const r=S.r[x.k];x.w=r?wk(r[0],r[1],x.hf):x.sd;done+=x.w;bal+=x.w-x.sd});
+const td=days[ti]&&!days[ti].t,dt=td?days[ti]:{hf:"",sd:480},wt=td?wk(St,E,dt.hf):0,nb=td?bal+wt-dt.sd:bal,be=x=>x.hf=="p"?720:1050,BE=be(dt),FL=dt.hf?0:960,nx=days.find(x=>x.i>ti&&!x.t),NB=nx?be(nx):1050;
+const loss=nb>0?Math.max(0,nb-90*fut):0;let c1,c2,b1,b2,red=0;
+if(bal>0){c1=["오늘 최단 퇴근",t12(Math.max(FL,BE-Math.min(bal,90)))];c2=["적립 시간","+"+hh(bal),"g"]}
+else if(bal<0){c1=["오늘 필요 퇴근",t12(BE-bal),"r"];c2=["부족 시간","−"+hh(-bal),"r"]}
+else{c1=["기본 퇴근",t12(BE)];c2=["적립 시간","0h","g"]}
+const T=t12(E),pre=td&&!dt.hf&&E<960?"16시 이전 퇴근은 불가한 시각이에요. ":"";
+if(nb>=0){b1=pre+"오늘 "+T+" 퇴근하면 "+(nb?hh(nb)+" 남아요":"딱 맞아요");
+if(!fut)b2=nb?"마지막 근무일이라 "+hh(nb)+"는 이월되지 않아요":"이번 주 근무시간을 다 채웠어요";
+else b2=(nb?"다음 근무일 "+t12(NB-Math.min(nb,90))+" 퇴근 가능":"다음 근무일은 "+t12(NB)+" 퇴근");
+if(loss){red=1;b2+=" · "+hh(loss)+" 손해 예상"}}
+else{red=1;const d=-nb;if(!fut){b1=pre+"이번 주 "+hh(d)+" 미달이에요";b2="이월되지 않아 더 채울 수 없어요"}
+else{const per=Math.ceil(d/fut);b1=pre+"한 번에 채우면 다음 근무일 "+t12(NB+d)+" 퇴근";b2="나눠 채우면 하루 +"+per+"분 ("+t12(NB+per)+")"}}
+return{days,ti,need,done,rem:need-done,bal,nb,fut,wt,td,c1,c2,b1,b2,red,warn:nb<0&&fut>0||(nb<0&&!fut)}}
+/*E*/
+const $=s=>document.querySelector(s),L=localStorage,cl=s=>Array.from(String(s||"").trim().replace(/\s+/g," ")).slice(0,8).join(""),es=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));let S={r:{},x:[],v:[],h:{},n:"",z:0};
+try{Object.assign(S,JSON.parse(L.wq||"{}"))}catch(e){}S.h=S.h||{};S.n=cl(S.n);S.z=S.z?1:0;
+const sv=()=>L.wq=JSON.stringify(S),q=new URLSearchParams(location.search).get("d");
+const now=()=>q?new Date(q+"T12:00:00"):new Date();
+let St=480,E=1050,ed=null,key="",dkey="";
+function init(){const n=now(),k=ds(n);if(k==key)return;key=k;const r=S.r[k];if(r){St=r[0];E=r[1]}else{const hf=S.h[k]||"",be=hf=="p"?720:1050;St=hf=="a"?810:480;const c=calc(n,S,St,be);
+E=c.bal>0?Math.max(hf?0:960,be-Math.min(c.bal,90)):be-c.bal}}
+function render(){init();const n=now(),c=calc(n,S,St,E),fr=Math.min(1,c.done/c.need||0),R=82,C=2*Math.PI*R,a=-Math.PI/2+2*Math.PI*fr;
+$("#pl").textContent="월화수목금日".charAt(c.ti>4?5:c.ti).replace("日","주말")+(c.ti>4?"":"요일")+" · 오늘";
+const star=fr>0?`<path d="M${100+R*Math.cos(a)},${100+R*Math.sin(a)-8}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)+8},${100+R*Math.sin(a)}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)},${100+R*Math.sin(a)+8}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)-8},${100+R*Math.sin(a)}Q${100+R*Math.cos(a)},${100+R*Math.sin(a)} ${100+R*Math.cos(a)},${100+R*Math.sin(a)-8}Z" fill="#F6C65B"/>`:"";
+const B=96,k=7/60,y8=B-480*k;let ch=`<line x1="6" x2="294" y1="${y8}" y2="${y8}" stroke="#F58FB8" stroke-dasharray="5 4"/><line x1="6" x2="294" y1="${B}" y2="${B}" stroke="#F6D6E4"/>`;
+c.days.forEach(x=>{const cx=30+60*x.i,td=x.i==c.ti&&c.td,sd=x.sd||480,y8=B-sd*k,w=x.w,hn=x.hf=="a"?"오전":"오후";let lab=x.t||(x.hf?hn+" 4h":"—"),cl="#7C5271";const top=w=>B-w*k,bx=`x="${cx-15}" width="30" rx="5"`,dy=x.hf?`<line x1="${cx-19}" x2="${cx+19}" y1="${y8}" y2="${y8}" stroke="#B79CED" stroke-width="2"/>`:"";
+if(x.t){lab=x.t}else if(td){const h=Math.max(c.wt,0);ch+=`<rect ${bx} y="${top(h)}" height="${h*k}" fill="#FDE2EE" stroke="#F27DAB" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${cx}" y="${top(h)-5}" text-anchor="middle" font-size="11" fill="#A12B62" font-weight="600">오늘</text>${dy}`;lab="진행 중";cl="#A12B62"}
+else if(w!==undefined){if(w>sd)ch+=`<rect ${bx} y="${top(w)}" height="${(w-sd)*k+8}" fill="#F6C65B"/>`;ch+=`<rect ${bx} y="${w>sd?y8:top(w)}" height="${w>sd?B-y8:w*k}" fill="url(#g1)"/>`;
+if(w<sd)ch+=`<rect ${bx} y="${y8}" height="${(sd-w)*k}" fill="#FFEDE3" stroke="#C0392B" stroke-dasharray="3 3"/>`;
+if(w!=sd)ch+=`<text x="${cx}" y="${(w>sd?top(w):y8)-5}" text-anchor="middle" font-size="11" font-weight="600" fill="${w>sd?"#2E8B6A":"#A93226"}">${dl(w-sd)}</text>`;ch+=dy;lab=hm(w)}
+else if(x.hf){ch+=`<rect ${bx} y="${y8}" height="${sd*k}" fill="#F4EEFF" stroke="#B79CED" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${cx}" y="${y8-5}" text-anchor="middle" font-size="11" font-weight="600" fill="#A12B62">기준 4h</text>`}
+ch+=`<text x="${cx}" y="113" text-anchor="middle" font-size="12" font-weight="600" fill="#4A2342">${"월화수목금"[x.i]+(x.hf?"·반":"")}</text><text x="${cx}" y="127" text-anchor="middle" font-size="10.5" fill="${cl}">${lab}</text><rect x="${cx-29}" y="0" width="58" height="132" fill="transparent" data-day="${x.i}"/>`});
+$("#mn").className=S.n?"hn":"";$("#mn").innerHTML=`<svg class="crown" width="26" height="19" viewBox="22 30 28 22"><path d="M24,49 24,36 31,42 36,33 41,42 48,36 48,49Z" fill="#F6C65B" stroke="#D99A2B" stroke-linejoin="round"/><rect x="24" y="45" width="24" height="4" rx="2" fill="#F58FB8"/></svg>${S.n?`<div class="nk"><i>✦</i><span>${es(S.n)}</span><i>✦</i></div>`:""}
+<div class="ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="${R}" fill="#fff" stroke="#F6D6E4" stroke-width="13"/><circle cx="100" cy="100" r="${R}" fill="none" stroke="url(#g1)" stroke-width="13" stroke-linecap="round" stroke-dasharray="${fr*C} ${C}" transform="rotate(-90 100 100)"/>${star}</svg>
+<div class="in">남은 근무시간<b>${Math.floor(c.rem/60)}시간 ${p2(c.rem%60)}분</b>${hh(c.done)} 완료 · 목표 ${hh(c.need)}</div></div>
+<div class="chips"><div class="chip ${c.c1[2]||""}">${c.c1[0]}<b>${c.c1[1]}</b></div><div class="chip ${c.c2[2]}">${c.c2[0]}<b>${c.c2[1]}</b></div></div>
+<div class="ban ${c.red?"r":""}"><b>${c.b1}</b>${c.b2}</div>
+<div class="card"><h2>이번 주 근무시간<small class="${c.nb<0?"r":""}">${c.nb<0?"금요일까지 못 채우면 "+hh(c.need)+" 미달":"점선 8h 기준 · 금빛 적립"}</small></h2><svg viewBox="0 0 300 132">${ch}</svg><p class="hint">요일을 누르면 연차·반차 지정, 퇴근 시각 수정</p></div>`;
+const dk=c.days[c.ti],hr=Math.floor(E/60)%12||12,kp=ed?`<div class="kp on"><div class="kt" id="kt">${ed.k=="s"?"출근":"퇴근"} ${ed.f=="h"?"시":"분"} 입력</div><div class="kg">${"123456789".replace(/./g,d=>`<button data-k="${d}">${d}</button>`)}<button class="s" data-k="d">지우기</button><button data-k="0">0</button><button class="s" data-k="c">취소</button></div><button class="go" data-k="n">${ed.f=="h"?"다음":"완료"}</button></div>`:"";
+const dis=!c.td;$("#dock").innerHTML=`<div class="lb"><span>${c.td?["월","화","수","목","금"][c.ti]+"요일 퇴근 기록"+(dk.hf?(dk.hf=="a"?" · 오전 반차":" · 오후 반차"):""):"오늘은 "+(dk&&dk.t||"쉬는 날")+"이에요"}</span><a id="st">출근 ${t12(St)}</a></div>
+<div class="row"><div class="tm"><i>${E<720?"오전":"오후"}</i><b id="eh" class="${ed&&ed.k=="e"&&ed.f=="h"?"on":""}">${hr}</b>:<b id="em" class="${ed&&ed.k=="e"&&ed.f=="m"?"on":""}">${p2(E%60)}</b></div>
+${ed?"":`<div class="pm"><button data-d="-5">−5분</button><button data-d="-1">−1분</button><button data-d="1">+1분</button></div>`}</div>${kp}${ed?"":`<button class="go" id="rc" ${dis?"disabled":""}>퇴근 기록</button>`}`;
+if(ed&&ed.k=="s"){$("#eh").textContent=Math.floor(St/60)%12||12;$("#em").textContent=p2(St%60);$("#eh").className=ed.f=="h"?"on":"";$("#em").className=ed.f=="m"?"on":""}
+}
+function toast(s){const t=$("#toast");t.textContent=s;t.className="on";setTimeout(()=>t.className="",1500)}
+function key2(k){const v=ed.buf;if(k=="c"){ed=null;return render()}if(k=="d")ed.buf=v.slice(0,-1);
+else if(k=="n"){const cur=ed.k=="s"?St:E,pm=ed.k=="e";let n=v===""?null:+v;
+if(ed.f=="h"){const h=n===null?(Math.floor(cur/60)%12||12):n;if(h<1||h>12){render();$("#kt").textContent="시는 1~12 사이로 입력해 주세요";$("#kt").className="kt e";return}
+const m=cur%60,nv=(ed.k=="s"?(h>=6&&h<=11?h:h==12?12:h+12):(h==12?12:S.h[ds(now())]=="p"&&h>=6&&h<=11?h:h+12))*60+m;ed.k=="s"?St=nv:E=nv;ed.f="m";ed.buf=""}
+else{const mi=n===null?cur%60:n;if(mi>59){render();$("#kt").textContent="분은 0~59 사이로 입력해 주세요";$("#kt").className="kt e";return}
+const nv=Math.floor(cur/60)*60+mi;ed.k=="s"?St=nv:E=nv;ed=null}return render()}
+else if(v.length<2)ed.buf=v+k;
+render();if(ed){const el=$(ed.k=="s"?(ed.f=="h"?"#eh":"#em"):ed.f=="h"?"#eh":"#em");if(ed.buf!==""){el.textContent=ed.buf}}}
+function openDay(i){const c=calc(now(),S,St,E),x=c.days[i],k=x.k,r=S.r[k],cur=S.v.includes(k)?"v":S.h[k]||"",mm=k.split("-");dkey=k;
+$("#dt").textContent=+mm[1]+"월 "+(+mm[2])+"일 "+"월화수목금"[i]+"요일";let h=`<p style="color:var(--t2)">${x.t||"근무일"}</p>`;
+if(x.t=="공휴일"||x.t=="휴무")h+=`<p style="margin-top:8px">${x.t}은 바꿀 수 없어요. 공휴일이 빠졌다면 설정에서 임시공휴일로 추가해 주세요.</p>`;
+else{h+=[["v","연차 (8시간 차감)"],["a","오전 반차 (4시간 차감)"],["p","오후 반차 (4시간 차감)"]].map(([t,l])=>`<button class="go ${cur==t?"":"o"}" data-t="${t}">${cur==t?"✓ ":""}${l}</button>`).join("")+(cur?`<button class="sm" style="margin-top:8px" data-t="n">지정 해제</button>`:"");
+if(cur!="v"&&i<c.ti){const e=r?r[1]:(cur=="p"?720:1050);h+=`<h2>퇴근 시각 수정${r?"":" (기록이 없어 기준 시간으로 계산 중)"}</h2><div class="hd"><input type="time" id="pt" value="${p2(Math.floor(e/60))}:${p2(e%60)}"><button class="sm" data-pt="${k}">저장</button>${r?`<button class="sm" data-pc="${k}">기록 지우기</button>`:""}</div>`}}
+$("#db").innerHTML=h;$("#dsh").classList.add("on")}
+document.addEventListener("click",e=>{const dd=e.target.closest("[data-day]");if(dd)return openDay(+dd.dataset.day);const b=e.target.closest("button,a,b");if(!b)return;
+if(b.id=="ns"){S.n=cl($("#nn").value);S.z=1;sv();$("#nm").classList.remove("on");render();return toast(S.n?"닉네임을 저장했어요":"설정에서 닉네임을 정할 수 있어요")}
+if(b.id=="nl"){S.z=1;sv();$("#nm").classList.remove("on");return toast("설정에서 닉네임을 정할 수 있어요")}
+if(b.id=="nsv"){S.n=cl($("#ni").value);S.z=1;sv();render();return toast(S.n?"닉네임을 저장했어요":"닉네임을 지웠어요")}
+if(b.id=="dc")return $("#dsh").classList.remove("on");
+if(b.dataset.t){const k=dkey,t=b.dataset.t,cur=S.v.includes(k)?"v":S.h[k]||"";S.v=S.v.filter(y=>y!=k);delete S.h[k];if(t!="n"&&t!=cur){t=="v"?S.v.push(k):S.h[k]=t}sv();$("#dsh").classList.remove("on");key="";render();return toast(t=="n"||t==cur?"지정을 해제했어요":"지정했어요")}
+if(b.dataset.pt){const t=$("#pt").value.split(":");if(t.length<2)return;const k=b.dataset.pt;S.r[k]=[S.r[k]?S.r[k][0]:(S.h[k]=="a"?810:480),+t[0]*60+ +t[1]];sv();$("#dsh").classList.remove("on");render();return toast("퇴근 시각을 고쳤어요")}
+if(b.dataset.pc){delete S.r[b.dataset.pc];sv();$("#dsh").classList.remove("on");render();return toast("기록을 지웠어요")}
+if(b.dataset.k!==undefined&&ed)return key2(b.dataset.k);
+if(b.dataset.d){E=Math.min(1439,Math.max(0,E+ +b.dataset.d));return render()}
+if(b.id=="eh"||b.id=="em"){if(!calc(now(),S,St,E).td)return;ed={k:ed&&ed.k=="s"?"s":"e",f:b.id=="eh"?"h":"m",buf:""};return render()}
+if(b.id=="st"){ed={k:"s",f:"h",buf:""};return render()}
+if(b.id=="rc"){const c=calc(now(),S,St,E);if(!c.td)return;S.r[ds(now())]=[St,E];sv();toast("퇴근 시각을 기록했어요");render()}
+if(b.id=="gb"){tags();$("#ni").value=S.n;prev();$("#set").classList.add("on")}if(b.id=="sx")$("#set").classList.remove("on");
+if(b.id=="av"||b.id=="ax"){const i=$(b.id=="av"?"#dv":"#dx"),a=b.id=="av"?S.v:S.x;if(i.value&&!a.includes(i.value))a.push(i.value);i.value="";sv();tags();render()}
+if(b.id=="bk"){const j=JSON.stringify(S);(navigator.clipboard?navigator.clipboard.writeText(j):Promise.reject()).then(()=>toast("백업을 복사했어요"),()=>prompt("아래 내용을 복사해 두세요",j))}
+if(b.id=="rs"){const j=prompt("백업 내용을 붙여넣어 주세요");if(j){try{const o=JSON.parse(j);S={r:o.r||{},x:o.x||[],v:o.v||[],h:o.h||{},n:o.n!==undefined?cl(o.n):S.n,z:1};sv();key="";render();toast("불러왔어요")}catch(e){toast("백업 형식이 올바르지 않아요")}}}
+if(b.dataset.rm){const[a,v]=b.dataset.rm.split("|");S[a]=S[a].filter(x=>x!=v);sv();tags();render()}});
+function tags(){const f=(a,id)=>$(id).innerHTML=S[a].sort().map(v=>`<span><button class="gear" style="font-size:13px" data-rm="${a}|${v}">${v} ✕</button></span>`).join("")||"<span>없음</span>";f("v","#tv");f("x","#tx")}
+const prev=()=>{const v=cl($("#ni").value);$("#np").textContent=v?"미리보기 · ✦ "+v+" ✦":"비워두면 이름 줄이 표시되지 않아요"};$("#ni").addEventListener("input",prev);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){render()}});render();if(!S.z)$("#nm").classList.add("on");
+</script></body></html>
