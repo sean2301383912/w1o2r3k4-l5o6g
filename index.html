@@ -49,7 +49,7 @@ main{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-ove
 .hd{display:flex;gap:8px;align-items:center}
 input{-webkit-user-select:text;user-select:text}
 #nm{position:absolute;inset:0;background:rgba(74,35,66,.45);display:none;align-items:center;justify-content:center;z-index:9;padding:24px}#nm.on{display:flex}#nm .bx{background:var(--bg);border:1px solid var(--bd);border-radius:22px;padding:22px 20px 18px;width:100%;text-align:center}#nm h2{font-size:17px;margin:8px 0 4px}#nm p{font-size:12px;color:var(--t2);margin-bottom:12px}#nm input{width:100%;text-align:center;font-size:18px}#nm .sm{margin-top:8px}
-</style></head><body><div id="app">
+#dock .go.o{background:#fff;color:var(--ac);border:1px solid #F0A9C7;margin-top:8px}#cf{position:absolute;inset:0;background:rgba(74,35,66,.45);display:none;align-items:center;justify-content:center;z-index:9;padding:24px}#cf.on{display:flex}#cf .bx{background:var(--bg);border:1px solid var(--bd);border-radius:22px;padding:22px 20px 18px;width:100%;text-align:center}#cf h2{font-size:15px;margin:0 0 6px;color:var(--t2);font-weight:600}#cf .v{font-size:34px;font-weight:700;margin-bottom:6px}#cf .d{min-height:22px;margin-bottom:14px}#cf .d b{font-size:16px}#cf .d b.g{color:var(--ok)}#cf .d b.r{color:var(--rd)}#cf .bt{display:flex;gap:10px}#cf .bt button{flex:1;margin:0}#cf .bt .go.o{margin-top:0}</style></head><body><div id="app">
 <svg width="0" height="0" style="position:absolute"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F58FB8"/><stop offset="1" stop-color="#B79CED"/></linearGradient></defs></svg>
 <header><h1>퇴근 계산기</h1><span class="pill" id="pl"></span><button class="gear" id="gb" aria-label="설정">⚙︎</button></header>
 <main id="mn"></main>
@@ -61,6 +61,7 @@ input{-webkit-user-select:text;user-select:text}
 <h2>백업</h2><div class="hd"><button class="sm" id="bk">백업 복사</button><button class="sm" id="rs">불러오기</button></div>
 <p style="font-size:12px;color:var(--t2);margin-top:14px">공휴일은 2026년 10월~2027년까지 내장되어 있어요. 기록은 이 기기에만 저장돼요. 태그를 누르면 삭제돼요.</p></div>
 <div id="dsh"><div class="hd"><h1 id="dt" style="flex:1"></h1><button class="sm" id="dc">닫기</button></div><div id="db"></div></div>
+<div id="cf"><div class="bx"><h2 id="cft"></h2><div class="v" id="cfv"></div><div class="d" id="cfd"></div><div class="bt"><button class="go o" id="cn">취소</button><button class="go" id="cy">확인</button></div></div></div>
 <div id="nm"><div class="bx"><svg width="34" height="25" viewBox="22 30 28 22"><path d="M24,49 24,36 31,42 36,33 41,42 48,36 48,49Z" fill="#F6C65B" stroke="#D99A2B" stroke-linejoin="round"/><rect x="24" y="45" width="24" height="4" rx="2" fill="#F58FB8"/></svg><h2>닉네임을 정해주세요</h2><p>앱 위쪽에 보여드릴게요 · 최대 8글자</p><input id="nn" maxlength="8" placeholder="닉네임 입력" autocomplete="off"><button class="go" id="ns" style="margin-top:12px">시작하기</button><button class="sm" id="nl">나중에</button></div></div></div>
 <script>
 /*L*/
@@ -75,19 +76,20 @@ function calc(now,S,St,E){
 const dw=(now.getDay()+6)%7,m=new Date(now.getFullYear(),now.getMonth(),now.getDate()-dw);
 const days=[0,1,2,3,4].map(i=>{const d=new Date(m.getFullYear(),m.getMonth(),m.getDate()+i);const k=ds(d),t=kind(d,S),hf=t?"":(S.h[k]||"");return{k,t,i,hf,sd:hf?240:480}});
 const ti=dw>4?5:dw,need=days.reduce((a,x)=>a+(x.t?0:x.sd),0);let done=0,bal=0,fut=0;
-days.forEach(x=>{if(x.t||x.i==ti)return;if(x.i>ti){fut++;return}const r=S.r[x.k];x.w=r?wk(r[0],r[1],x.hf):x.sd;done+=x.w;bal+=x.w-x.sd});
-const td=days[ti]&&!days[ti].t,dt=td?days[ti]:{hf:"",sd:480},wt=td?wk(St,E,dt.hf):0,nb=td?bal+wt-dt.sd:bal,be=x=>x.hf=="p"?720:1050,BE=be(dt),FL=dt.hf=="p"?0:960,nx=days.find(x=>x.i>ti&&!x.t),NB=nx?be(nx):1050;
+days.forEach(x=>{if(x.t||x.i==ti&&!S.r[x.k])return;if(x.i>ti){fut++;return}const r=S.r[x.k];x.w=r?wk(r[0],r[1],x.hf):x.sd;done+=x.w;bal+=x.w-x.sd});
+const cf=!!(days[ti]&&!days[ti].t&&S.r[days[ti].k]),td=days[ti]&&!days[ti].t&&!cf,dt=td?days[ti]:{hf:"",sd:480},wt=td?wk(St,E,dt.hf):0,nb=td?bal+wt-dt.sd:bal,be=x=>x.hf=="p"?720:1050,BE=be(dt),FL=dt.hf=="p"?0:960,nx=days.find(x=>x.i>ti&&!x.t),NB=nx?be(nx):1050,BX=cf?NB:BE,FX=cf&&nx&&nx.hf=='p'?0:FL,P=cf?'다음 ':'오늘 ';
 let c1,c2,b1,b2,red=0;
-if(bal>0){c1=["오늘 최단 퇴근",t12(Math.max(FL,BE-Math.min(bal,90)))];c2=["적립 시간","+"+hh(bal),"g"]}
-else if(bal<0){c1=["오늘 필요 퇴근",t12(BE-bal),"r"];c2=["부족 시간","−"+hh(-bal),"r"]}
-else{c1=["기본 퇴근",t12(BE)];c2=["적립 시간","0분","g"]}
+if(bal>0){c1=[P+"최단 퇴근",t12(Math.max(FX,BX-Math.min(bal,90)))];c2=["적립 시간","+"+hh(bal),"g"]}
+else if(bal<0){c1=[P+"필요 퇴근",t12(BX-bal),"r"];c2=["부족 시간","−"+hh(-bal),"r"]}
+else{c1=[cf?"다음 기본 퇴근":"기본 퇴근",t12(BX)];c2=["적립 시간","0분","g"]}
+if(cf&&!nx)c1=["기본 퇴근",t12(BE)];
 b1=b2="";
 if(td){const lsE=e=>{const n=bal+wk(St,e,dt.hf)-dt.sd;return n>0?Math.max(0,n-90*fut):0};let lim=-1;for(let e=FL;e<=1500;e++)if(!lsE(e))lim=e;
 if(bal>0)b1=t12(Math.max(FL,BE-Math.min(bal,90)))+"에 퇴근할 수 있어요";else if(bal<0){b1=hh(-bal)+" 더 근무 필요해요 ("+t12(BE-bal)+" 퇴근)";red=1}
 let l2="";if(fut==1&&lim>=0)l2=t12(lim)+" 전에 퇴근하면 손해 없어요";else if(!fut&&bal>0)l2="더 늦게 퇴근하면 그만큼 손해예요";
 if(!b1&&l2){b1=l2;l2=""}b2=l2}
 else if(fut&&bal){if(bal>0)b1="다음 근무일 "+t12(NB-Math.min(bal,90))+"에 퇴근할 수 있어요";else{b1="다음 근무일 "+hh(-bal)+" 더 근무 필요해요 ("+t12(NB-bal)+" 퇴근)";red=1}}
-return{days,ti,need,done,rem:Math.max(0,need-done),bal,nb,fut,wt,td,c1,c2,b1,b2,red,warn:nb<0&&fut>0||(nb<0&&!fut)}}
+return{cf,days,ti,need,done,rem:Math.max(0,need-done),bal,nb,fut,wt,td,c1,c2,b1,b2,red,warn:nb<0&&fut>0||(nb<0&&!fut)}}
 /*E*/
 const $=s=>document.querySelector(s),L=localStorage,cl=s=>Array.from(String(s||"").trim().replace(/\s+/g," ")).slice(0,8).join(""),es=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));let S={r:{},x:[],v:[],h:{},n:"",z:0};
 try{Object.assign(S,JSON.parse(L.wq||"{}"))}catch(e){}S.h=S.h||{};S.n=cl(S.n);S.z=S.z?1:0;
@@ -123,9 +125,9 @@ $("#mn").className=S.n?"hn":"";$("#mn").innerHTML=`<svg class="crown" width="26"
 ${c.b1?`<div class="ban ${c.red?"r":""}"><b>${c.b1}</b>${c.b2}</div>`:""}
 <div class="card"><h2>이번 주 근무시간<small>요일을 눌러 연차·반차 지정</small></h2><svg viewBox="0 0 300 118">${ch}</svg></div>`;
 const dk=c.days[c.ti],hr=Math.floor(E/60)%12||12,kp=ed?`<div class="kp on"><div class="kt" id="kt">${ed.k=="s"?"출근":"퇴근"} ${ed.f=="h"?"시":"분"} 입력</div><div class="kg">${"123456789".replace(/./g,d=>`<button data-k="${d}">${d}</button>`)}<button class="s" data-k="d">지우기</button><button data-k="0">0</button><button class="s" data-k="c">취소</button></div><button class="go" data-k="n">${ed.f=="h"?"다음":"완료"}</button></div>`:"";
-const early=c.td&&dk.hf!="p"&&E<960,dis=!c.td||early;$("#dock").innerHTML=`<div class="lb"><span>${c.td?["월","화","수","목","금"][c.ti]+"요일 퇴근 기록"+(dk.hf?(dk.hf=="a"?" · 오전 반차":" · 오후 반차"):""):(x=>"오늘은 "+x+(/[가-힣]/.test(x)&&(x.charCodeAt(x.length-1)-44032)%28==0?"예요":"이에요"))(dk&&dk.t||"쉬는 날")}</span><a id="st">출근 ${t12(St)}</a></div>
+const early=c.td&&dk.hf!="p"&&E<960,dis=!c.td||early;$("#dock").innerHTML=`<div class="lb"><span>${c.td||c.cf?["월","화","수","목","금"][c.ti]+"요일 퇴근 기록"+(c.cf?"됨":"")+(dk.hf?(dk.hf=="a"?" · 오전 반차":" · 오후 반차"):""):(x=>"오늘은 "+x+(/[가-힣]/.test(x)&&(x.charCodeAt(x.length-1)-44032)%28==0?"예요":"이에요"))(dk&&dk.t||"쉬는 날")}</span><a id="st">출근 ${t12(St)}</a></div>
 <div class="row"><div class="tm"><i>${E<720?"오전":"오후"}</i><b id="eh" class="${ed&&ed.k=="e"&&ed.f=="h"?"on":""}">${hr}</b>:<b id="em" class="${ed&&ed.k=="e"&&ed.f=="m"?"on":""}">${p2(E%60)}</b></div>
-${ed?"":`<div class="pm"><button data-d="-5">−5분</button><button data-d="-1">−1분</button><button data-d="1">+1분</button></div>`}</div>${kp}${ed?"":`${early?`<p class="hint" style="margin:0 0 6px;text-align:center">16:00 이후부터 퇴근을 기록할 수 있어요</p>`:""}<button class="go" id="rc" ${dis?"disabled":""}>퇴근 기록</button>`}`;
+${ed||c.cf?"":`<div class="pm"><button data-d="-5">−5분</button><button data-d="-1">−1분</button><button data-d="1">+1분</button></div>`}</div>${kp}${ed?"":`${early?`<p class="hint" style="margin:0 0 6px;text-align:center">16:00 이후부터 퇴근을 기록할 수 있어요</p>`:""}<button class="go" id="rc" ${dis?"disabled":""}>퇴근 기록</button>`}`;if(c.cf&&!ed){const r0=$("#rc");r0&&r0.remove();$("#dock").insertAdjacentHTML("beforeend",`<button class="go o" id="rx" style="margin-top:0">수정</button>`)}
 if(ed&&ed.k=="s"){$("#eh").textContent=Math.floor(St/60)%12||12;$("#em").textContent=p2(St%60);$("#eh").className=ed.f=="h"?"on":"";$("#em").className=ed.f=="m"?"on":""}
 }
 function toast(s){const t=$("#toast");t.textContent=s;t.className="on";setTimeout(()=>t.className="",1500)}
@@ -141,7 +143,7 @@ function openDay(i){const c=calc(now(),S,St,E),x=c.days[i],k=x.k,r=S.r[k],cur=S.
 $("#dt").textContent=+mm[1]+"월 "+(+mm[2])+"일 "+"월화수목금"[i]+"요일";let h=`<p style="color:var(--t2)">${x.t||"근무일"}</p>`;
 if(x.t=="공휴일"||x.t=="휴무")h+=`<p style="margin-top:8px">${x.t}은 바꿀 수 없어요. 공휴일이 빠졌다면 설정에서 임시공휴일로 추가해 주세요.</p>`;
 else{h+=[["v","연차 (8시간 차감)"],["a","오전 반차 (4시간 차감)"],["p","오후 반차 (4시간 차감)"]].map(([t,l])=>`<button class="go ${cur==t?"":"o"}" data-t="${t}">${cur==t?"✓ ":""}${l}</button>`).join("")+(cur?`<button class="sm" style="margin-top:8px" data-t="n">지정 해제</button>`:"");
-if(cur!="v"&&i<c.ti){const e=r?r[1]:(cur=="p"?720:1050);h+=`<h2>퇴근 시각 수정${r?"":" (기록이 없어 기준 시간으로 계산 중)"}</h2><div class="hd"><input type="time" id="pt" value="${p2(Math.floor(e/60))}:${p2(e%60)}"><button class="sm" data-pt="${k}">저장</button>${r?`<button class="sm" data-pc="${k}">기록 지우기</button>`:""}</div>`}}
+if(cur!="v"&&(i<c.ti||i==c.ti&&r)){const e=r?r[1]:(cur=="p"?720:1050);h+=`<h2>퇴근 시각 수정${r?"":" (기록이 없어 기준 시간으로 계산 중)"}</h2><div class="hd"><input type="time" id="pt" value="${p2(Math.floor(e/60))}:${p2(e%60)}"><button class="sm" data-pt="${k}">저장</button>${r?`<button class="sm" data-pc="${k}">기록 지우기</button>`:""}</div>`}}
 $("#db").innerHTML=h;$("#dsh").classList.add("on")}
 document.addEventListener("click",e=>{const dd=e.target.closest("[data-day]");if(dd)return openDay(+dd.dataset.day);const b=e.target.closest("button,a,b");if(!b)return;
 if(b.id=="ns"){S.n=cl($("#nn").value);S.z=1;sv();$("#nm").classList.remove("on");render();return toast(S.n?"닉네임을 저장했어요":"설정에서 닉네임을 정할 수 있어요")}
@@ -155,7 +157,10 @@ if(b.dataset.k!==undefined&&ed)return key2(b.dataset.k);
 if(b.dataset.d){E=Math.min(1439,Math.max(0,E+ +b.dataset.d));dirty=1;return render()}
 if(b.id=="eh"||b.id=="em"){if(!calc(now(),S,St,E).td)return;ed={k:ed&&ed.k=="s"?"s":"e",f:b.id=="eh"?"h":"m",buf:""};return render()}
 if(b.id=="st"){ed={k:"s",f:"h",buf:""};return render()}
-if(b.id=="rc"){const c=calc(now(),S,St,E);if(!c.td)return;if(S.h[ds(now())]!="p"&&E<960)return toast("16:00 이후부터 기록할 수 있어요");S.r[ds(now())]=[St,E];sv();toast("퇴근 시각을 기록했어요");render()}
+if(b.id=="rc"){const c=calc(now(),S,St,E);if(!c.td)return;if(S.h[ds(now())]!="p"&&E<960)return toast("16:00 이후부터 기록할 수 있어요");const dd=c.wt-(c.days[c.ti].sd);$("#cft").textContent=["월","화","수","목","금"][c.ti]+"요일 퇴근 기록";$("#cfv").textContent=t12(E);$("#cfd").innerHTML=dd?`<b class="${dd>0?"g":"r"}">${dd>0?"+":"−"}${hh(Math.abs(dd))} ${dd>0?"적립":"부족"}</b>`:"";$("#cf").classList.add("on")}
+if(b.id=="cy"){S.r[ds(now())]=[St,E];sv();$("#cf").classList.remove("on");render();return toast("퇴근 시각을 기록했어요")}
+if(b.id=="cn")return $("#cf").classList.remove("on");
+if(b.id=="rx"){delete S.r[ds(now())];sv();render();return toast("시간을 고친 뒤 다시 기록해 주세요")}
 if(b.id=="gb"){tags();$("#ni").value=S.n;prev();$("#set").classList.add("on")}if(b.id=="sx")$("#set").classList.remove("on");
 if(b.id=="av"||b.id=="ax"){const i=$(b.id=="av"?"#dv":"#dx"),a=b.id=="av"?S.v:S.x;if(i.value&&!a.includes(i.value))a.push(i.value);i.value="";sv();tags();render()}
 if(b.id=="bk"){const j=JSON.stringify(S);(navigator.clipboard?navigator.clipboard.writeText(j):Promise.reject()).then(()=>toast("백업을 복사했어요"),()=>prompt("아래 내용을 복사해 두세요",j))}
